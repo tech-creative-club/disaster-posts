@@ -1,5 +1,6 @@
-最初にここを見る
-https://github.com/tech-creative-club/disaster-posts/issues/6
+最初にこの2つを見る
+- https://github.com/tech-creative-club/disaster-posts/discussions/8#discussioncomment-7987457
+- https://github.com/tech-creative-club/disaster-posts/issues/6
 
 
 # Mantine Next.js template
