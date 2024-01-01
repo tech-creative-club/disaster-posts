@@ -1,3 +1,7 @@
+最初にここを見る
+https://github.com/tech-creative-club/disaster-posts/issues/6
+
+
 # Mantine Next.js template
 
 This is a template for [Next.js](https://nextjs.org/) app router + [Mantine](https://mantine.dev/).
