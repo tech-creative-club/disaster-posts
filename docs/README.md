@@ -10,6 +10,12 @@ JP | [EN](README.en.md)
 - このアプリは、災害時における情報共有を目的としたアプリです。
 - [技創クラブ](https://discord.com/invite/SAFv8YkSFm) Discordサーバーでの開発を行っています。
 
+## 開発方針
+- 基本的にタスクはIssueベースで管理します
+- Issueにアサインして開発していただきま
+- 優先度はProjectsを参照してください
+- 議論したい内容が発生したら[Discussion](https://github.com/tech-creative-club/disaster-posts/discussions)を立ててください
+
 ## 開発環境
 
 ### フロントエンド

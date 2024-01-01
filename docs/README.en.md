@@ -11,6 +11,12 @@
 - This app is for sharing information in the event of a disaster.
 - Development is done on the [Tech Creative Club](https://discord.com/invite/SAFv8YkSFm) Discord server.
 
+## Development Policy
+- Basically, tasks are managed on an Issue basis.
+- Assign an issue and develop it.
+- Please refer to Projects for priority.
+- If you have something you want to discuss, please create a [Discussion](https://github.com/tech-creative-club/disaster-posts/discussions).
+
 ## Development Environment
 ### Frontend
 - [Next.js](https://nextjs.org/)
