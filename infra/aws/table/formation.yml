@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: DynamoDB global table
+Description: Disaster posts DynamoDB global table
 Parameters:
   ApplicationTag:
     Type: String
