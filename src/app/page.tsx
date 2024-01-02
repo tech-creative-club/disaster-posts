@@ -1,8 +1,8 @@
 'use client';
 
 import { Button, Textarea } from '@mantine/core';
-import styles from './page.module.scss';
 import React, { useState } from 'react';
+import styles from './page.module.scss';
 
 type Post = {
   id: number;
@@ -11,8 +11,7 @@ type Post = {
   content: string;
 };
 
-const getFormattedDate = (date: Date) => {
-  return new Intl.DateTimeFormat('ja-JP', {
+const getFormattedDate = (date: Date) => new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -21,7 +20,6 @@ const getFormattedDate = (date: Date) => {
     second: '2-digit',
     hour12: false, // 24時間表記を使用する場合
   }).format(date);
-};
 
 export default function HomePage() {
   const [postContent, setPostContent] = useState<string>('');
@@ -58,16 +56,14 @@ export default function HomePage() {
         </Button>
       </form>
       <div className={styles.content_list__wrapper}>
-        {posts.map((post) => {
-          return (
-            <div key={post.id}>
-              <span className={styles.content_list}>{post.id}</span>
-              <span className={styles.content_list}>{post.postedBy}</span>
-              <span className={styles.content_list}>{post.postedAt}</span>
-              <span className={styles.content_list}>{post.content}</span>
-            </div>
-          );
-        })}
+        {posts.map((post) => (
+          <div key={post.id}>
+            <span className={styles.content_list}>{post.id}</span>
+            <span className={styles.content_list}>{post.postedBy}</span>
+            <span className={styles.content_list}>{post.postedAt}</span>
+            <span className={styles.content_list}>{post.content}</span>
+          </div>
+        ))}
       </div>
     </main>
   );
