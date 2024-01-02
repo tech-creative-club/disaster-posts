@@ -1,0 +1,701 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Disaster posts VPC
+Parameters:
+  ApplicationTag:
+    Type: String
+    Description: Application tag
+  ApplicationId:
+    Type: String
+    Description: Application ARN
+  VpcCidr:
+    Type: String
+    Description: VPC CIDR
+    AllowedPattern: '^(10\.([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\.([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-6\5]))\.([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-6\5]))/(1[6-9]|2[0-6])$'
+    Default: '10.0.0.0/16'
+  CreateNATGateway:
+    Type: String
+    Description: Whether to create NAT gateway or not
+    AllowedValues:
+      - "EachAZ"
+      - "OneAZ"
+      - "None"
+    Default: "None"
+  CreateEc2MessagesEndpoint:
+    Type: String
+    Description: Whether to create EC2 messages endpoint
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+  CreateSsmEndpoint:
+    Type: String
+    Description: Whether to create SSM endpoint
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+  CreateSsmMessagesEndpoint:
+    Type: String
+    Description: Whether to create SSM messages endpoint
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+  CreateKmsEndpoint:
+    Type: String
+    Description: Whether to create KMS endpoint
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+  CreateCloudWatchLogsEndpoint:
+    Type: String
+    Description: Whether to create CloudWatch Logs endpoint
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+  CreateEcrDockerEndpoint:
+    Type: String
+    Description: Whether to create ECR Docker endpoint
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+  CreateEcrApiEndpoint:
+    Type: String
+    Description: Whether to create ECR API endpoint
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+Conditions:
+  HasNATGateway: !Not
+    - !Equals
+      - !Ref CreateNATGateway
+      - "None"
+  HasEacnAZNatGateway: !Equals
+    - !Ref CreateNATGateway
+    - "EachAZ"
+  HasEc2MessagesEndpoint: !Equals
+    - !Ref CreateEc2MessagesEndpoint
+    - "true"
+  HasSsmEndpoint: !Equals
+    - !Ref CreateSsmEndpoint
+    - "true"
+  HasSsmMessagesEndpoint: !Equals
+    - !Ref CreateSsmMessagesEndpoint
+    - "true"
+  HasKmsEndpoint: !Equals
+    - !Ref CreateKmsEndpoint
+    - "true"
+  HasCloudWatchLogsEndpoint: !Equals
+    - !Ref CreateCloudWatchLogsEndpoint
+    - "true"
+  HasEcrDockerEndpoint: !Equals
+    - !Ref CreateEcrDockerEndpoint
+    - "true"
+  HasEcrApiEndpoint: !Equals
+    - !Ref CreateEcrApiEndpoint
+    - "true"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Application settings
+        Parameters:
+          - ApplicationTag
+          - ApplicationId
+      - Label:
+          default: VPC base settings
+        Parameters:
+          - VpcCidr
+      - Label:
+          default: Gateway settings
+        Parameters:
+          - CreateNATGateway
+          - CreateEc2MessagesEndpoint
+          - CreateSsmEndpoint
+          - CreateSsmMessagesEndpoint
+          - CreateKmsEndpoint
+          - CreateCloudWatchLogsEndpoint
+          - CreateEcrDockerEndpoint
+          - CreateEcrApiEndpoint
+Resources:
+  # Application relationship definition
+  AppAssoc:
+    Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation
+    Properties:
+      Application: !Ref ApplicationId
+      Resource: !Ref AWS::StackId
+      ResourceType: CFN_STACK
+  # VPC definition
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Vpc"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  VpcIpv6Cidr:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      VpcId: !Ref Vpc
+      AmazonProvidedIpv6CidrBlock: true
+  # Internet Gateway definition
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-InternetGateway"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+  EgressOnlyGateway:
+    Type: AWS::EC2::EgressOnlyInternetGateway
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      VpcId: !Ref Vpc
+  # Subnets definition
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref AWS::Region
+      CidrBlock: !Select
+        - 0
+        - !Cidr
+          - !GetAtt Vpc.CidrBlock
+          - 6
+          - 13
+      Ipv6CidrBlock: !Select
+        - 0
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt Vpc.Ipv6CidrBlocks
+          - 6
+          - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicSubnet1"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Public
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref AWS::Region
+      CidrBlock: !Select
+        - 1
+        - !Cidr
+          - !GetAtt Vpc.CidrBlock
+          - 6
+          - 13
+      Ipv6CidrBlock: !Select
+        - 1
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt Vpc.Ipv6CidrBlocks
+          - 6
+          - 64
+      AssignIpv6AddressOnCreation: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet1"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Private
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref AWS::Region
+      CidrBlock: !Select
+        - 2
+        - !Cidr
+          - !GetAtt Vpc.CidrBlock
+          - 6
+          - 13
+      Ipv6CidrBlock: !Select
+        - 2
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt Vpc.Ipv6CidrBlocks
+          - 6
+          - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicSubnet2"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Public
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref AWS::Region
+      CidrBlock: !Select
+        - 3
+        - !Cidr
+          - !GetAtt Vpc.CidrBlock
+          - 6
+          - 13
+      Ipv6CidrBlock: !Select
+        - 3
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt Vpc.Ipv6CidrBlocks
+          - 6
+          - 64
+      AssignIpv6AddressOnCreation: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet2"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Private
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref AWS::Region
+      CidrBlock: !Select
+        - 4
+        - !Cidr
+          - !GetAtt Vpc.CidrBlock
+          - 6
+          - 13
+      Ipv6CidrBlock: !Select
+        - 4
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt Vpc.Ipv6CidrBlocks
+          - 6
+          - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicSubnet3"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Public
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref AWS::Region
+      CidrBlock: !Select
+        - 5
+        - !Cidr
+          - !GetAtt Vpc.CidrBlock
+          - 6
+          - 13
+      Ipv6CidrBlock: !Select
+        - 5
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt Vpc.Ipv6CidrBlocks
+          - 6
+          - 64
+      AssignIpv6AddressOnCreation: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet3"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Private
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  # Route tables and NAT Gateways definition
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicRouteTable"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Public
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PublicRouteIpv4:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicRouteIpv6:
+    Type: AWS::EC2::Route
+    DependsOn: VpcIpv6Cidr
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      GatewayId: !Ref InternetGateway
+  PublicSutnet1RouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+  PublicSubnet2RouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+  PublicSubnet3RouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet3
+  PrivateSubnet1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet1RouteTable"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Private
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet1RouteIpv6:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnet1RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref EgressOnlyGateway
+  PrivateSubnet1NatEIP:
+    Type: AWS::EC2::EIP
+    Condition: HasNATGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet1NatEIP"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet1NatGateway:
+    Type: AWS::EC2::NatGateway
+    Condition: HasNATGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      AllocationId: !GetAtt PrivateSubnet1NatEIP.AllocationId
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet1NatGateway"
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet1RouteIpv4:
+    Type: AWS::EC2::Route
+    Condition: HasNATGateway
+    Properties:
+      RouteTableId: !Ref PrivateSubnet1RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref PrivateSubnet1NatGateway
+  PrivateSubnet1RouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnet1RouteTable
+      SubnetId: !Ref PrivateSubnet1
+  PrivateSubnet2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet2RouteTable"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Private
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet2RouteIpv6:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnet2RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref EgressOnlyGateway
+  PrivateSubnet2NatEIP:
+    Type: AWS::EC2::EIP
+    Condition: HasEacnAZNatGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet2NatEIP"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet2NatGateway:
+    Type: AWS::EC2::NatGateway
+    Condition: HasEacnAZNatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      AllocationId: !GetAtt PrivateSubnet2NatEIP.AllocationId
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet2NatGateway"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet2RouteIpv4:
+    Type: AWS::EC2::Route
+    Condition: HasNATGateway
+    Properties:
+      RouteTableId: !Ref PrivateSubnet2RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !If
+        - HasEacnAZNatGateway
+        - !Ref PrivateSubnet2NatGateway
+        - !Ref PrivateSubnet1NatGateway
+  PrivateSubnet2RouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnet2RouteTable
+      SubnetId: !Ref PrivateSubnet2
+  PrivateSubnet3RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet3RouteTable"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: SubnetType
+          Value: Private
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet3RouteIpv6:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnet3RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref EgressOnlyGateway
+  PrivateSubnet3NatEIP:
+    Type: AWS::EC2::EIP
+    Condition: HasEacnAZNatGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet3NatEIP"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet3NatGateway:
+    Type: AWS::EC2::NatGateway
+    Condition: HasEacnAZNatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet3
+      AllocationId: !GetAtt PrivateSubnet3NatEIP.AllocationId
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet3NatGateway"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  PrivateSubnet3RouteIpv4:
+    Type: AWS::EC2::Route
+    Condition: HasNATGateway
+    Properties:
+      RouteTableId: !Ref PrivateSubnet3RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !If
+        - HasEacnAZNatGateway
+        - !Ref PrivateSubnet3NatGateway
+        - !Ref PrivateSubnet1NatGateway
+  PrivateSubnet3RouteTableAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnet3RouteTable
+      SubnetId: !Ref PrivateSubnet3
+  # VPC endpoints definition
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcId: !Ref Vpc
+      RouteTableIds:
+        - !Ref PrivateSubnet1RouteTable
+        - !Ref PrivateSubnet2RouteTable
+        - !Ref PrivateSubnet3RouteTable
+      VpcEndpointType: Gateway
+  DynaoDbEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.dynamodb"
+      VpcId: !Ref Vpc
+      RouteTableIds:
+        - !Ref PrivateSubnet1RouteTable
+        - !Ref PrivateSubnet2RouteTable
+        - !Ref PrivateSubnet3RouteTable
+      VpcEndpointType: Gateway
+  Ec2MessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: HasEc2MessagesEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ec2messages"
+      VpcId: !Ref Vpc
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      VpcEndpointType: Interface
+  SsmEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: HasSsmEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ssm"
+      VpcId: !Ref Vpc
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      VpcEndpointType: Interface
+  SsmMessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: HasSsmMessagesEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ssmmessages"
+      VpcId: !Ref Vpc
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      VpcEndpointType: Interface
+  KmsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: HasKmsEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.kms"
+      VpcId: !Ref Vpc
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      VpcEndpointType: Interface
+  CloudWatchLogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: HasCloudWatchLogsEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.logs"
+      VpcId: !Ref Vpc
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      VpcEndpointType: Interface
+  EcrDockerEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: HasEcrDockerEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.dkr"
+      VpcId: !Ref Vpc
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      VpcEndpointType: Interface
+  EcrApiEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: HasEcrApiEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.api"
+      VpcId: !Ref Vpc
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VpcEndpointSecurityGroup
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      VpcEndpointType: Interface
