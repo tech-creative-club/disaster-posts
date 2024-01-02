@@ -12,7 +12,8 @@ JP | [EN](README.en.md)
 
 ## 開発方針
 - 基本的にタスクはIssueベースで管理します
-- Issueにアサインして開発していただきま
+- 作業開始前にIssueを作り、できればその作業が必要かどうか合意を取りましょう
+- Issueにアサインして開発していただきます
 - 優先度はProjectsを参照してください
 - 議論したい内容が発生したら[Discussion](https://github.com/tech-creative-club/disaster-posts/discussions)を立ててください
 
