@@ -3,6 +3,7 @@
 import { Button, Textarea } from '@mantine/core';
 import styles from './page.module.scss';
 import React, { useState } from 'react';
+import { format } from 'date-fns';
 
 type Post = {
   id: number;
@@ -10,27 +11,6 @@ type Post = {
   postedAt: string;
   content: string;
 };
-
-// FIXME: 外部ディレクトリに切り出し
-function getCurrentFormattedDate(): string {
-  const currentDate: Date = new Date();
-
-  const year: number = currentDate.getFullYear();
-  const month: number = currentDate.getMonth() + 1; // 0から始まるため、1を加えて実際の月を取得
-  const day: number = currentDate.getDate();
-  const hours: number = currentDate.getHours();
-  const minutes: number = currentDate.getMinutes();
-  const seconds: number = currentDate.getSeconds();
-
-  // ゼロパディング関数
-  const zeroPad = (num: number): string => (num < 10 ? `0${num}` : `${num}`);
-
-  const formattedDate: string = `${year}/${zeroPad(month)}/${zeroPad(day)} ${zeroPad(
-    hours
-  )}:${zeroPad(minutes)}:${zeroPad(seconds)}`;
-
-  return formattedDate;
-}
 
 export default function HomePage() {
   const [postContent, setPostContent] = useState<string>('');
@@ -50,7 +30,7 @@ export default function HomePage() {
       {
         id: posts[posts.length - 1].id + 1,
         postedBy: '田中四郎',
-        postedAt: getCurrentFormattedDate(),
+        postedAt: format(new Date(), 'yyyy/MM/dd hh:mm:ss'),
         content: postContent,
       },
     ]);
