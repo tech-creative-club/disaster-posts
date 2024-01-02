@@ -3,13 +3,24 @@
 import { Button, Textarea } from '@mantine/core';
 import styles from './page.module.scss';
 import React, { useState } from 'react';
-import { format } from 'date-fns';
 
 type Post = {
   id: number;
   postedBy: string;
   postedAt: string;
   content: string;
+};
+
+const getFormattedDate = (date: Date) => {
+  return new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false, // 24時間表記を使用する場合
+  }).format(date);
 };
 
 export default function HomePage() {
@@ -30,7 +41,7 @@ export default function HomePage() {
       {
         id: posts[posts.length - 1].id + 1,
         postedBy: '田中四郎',
-        postedAt: format(new Date(), 'yyyy/MM/dd hh:mm:ss'),
+        postedAt: getFormattedDate(new Date()),
         content: postContent,
       },
     ]);
