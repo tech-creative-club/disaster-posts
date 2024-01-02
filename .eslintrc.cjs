@@ -1,5 +1,12 @@
 module.exports = {
-  extends: ['mantine', 'plugin:@next/next/recommended', 'plugin:jest/recommended'],
+  extends: [
+    'mantine',
+    'plugin:@next/next/recommended',
+    'plugin:jest/recommended',
+    'next/core-web-vitals',
+    'plugin:import/recommended',
+    'plugin:import/warnings',
+  ],
   plugins: ['testing-library', 'jest'],
   overrides: [
     {
@@ -13,5 +20,13 @@ module.exports = {
   rules: {
     'react/react-in-jsx-scope': 'off',
     'import/extensions': 'off',
+    'import/order': [
+      'error',
+      {
+        alphabetize: {
+          order: 'asc',
+        },
+      },
+    ],
   },
 };
