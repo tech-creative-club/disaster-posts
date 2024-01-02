@@ -34,7 +34,6 @@ export default function HomePage() {
     setPostContent(event.target.value);
   };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(e);
     e.preventDefault();
     setPosts([
       ...posts,
