@@ -11,7 +11,8 @@ type Post = {
   content: string;
 };
 
-const getFormattedDate = (date: Date) => new Intl.DateTimeFormat('ja-JP', {
+const getFormattedDate = (date: Date) =>
+  new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -42,16 +43,18 @@ export default function HomePage() {
         content: postContent,
       },
     ]);
+    setPostContent('');
   };
   return (
     <main>
       <form className={styles.post_form} onSubmit={handleSubmit}>
         <Textarea
           className={styles.text_area}
+          value={postContent}
           onChange={handlePostContentChange}
           placeholder="投稿内容を入力"
         />
-        <Button type="submit" className={styles.post_button} variant="outline">
+        <Button type="submit" className={styles.post_button} variant="outline" disabled={!postContent}>
           投稿
         </Button>
       </form>
