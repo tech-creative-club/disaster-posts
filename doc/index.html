@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--
+  Material Design Lite
+  Copyright 2015 Google Inc. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License
+-->
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=960">
+    <!-- <meta name="viewport" content="width=320, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"> -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.min.css">
+    <link rel="stylesheet" href="styles_top.css">
+    <!-- <link rel="icon" href="design/Logo.png" sizes="32x32"> -->
+    <!-- <link rel="icon" href="design/Logo.png" sizes="192x192"> -->
+    <!-- <link rel="apple-touch-icon-precomposed" href="design/Logo.png"> -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <!-- <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-XXXX');
+    </script> -->
+    <script type="text/javascript" src="design/jquery-3.4.1.min.js"></script>
+    <!-- Google検索関連の設定 -->
+    <script>
+        function enter() {
+            if (window.event.keyCode == 13) {
+                var last_keyword = $('#search-field').val();
+                window.location.href = "" + last_keyword;
+            }
+        }
+    </script>
+    <style>
+        #view-source {
+            position: fixed;
+            display: block;
+            right: 0;
+            bottom: 0;
+            margin-right: 40px;
+            margin-bottom: 40px;
+            z-index: 900;
+        }
+    </style>
+</head>
+
+<body>
+    <title>Disaster Posts </title>
+    <!-- SEO対策関連はここ -->
+    <meta name="description" content="">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <meta name="keywords" content="">
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <div class="android-header mdl-layout__header mdl-layout__header--waterfall">
+            <div class="mdl-layout__header-row">
+                <span class="android-title mdl-layout-title">
+                    <a href="index.html"></a>
+                </span>
+                <!-- Add spacer, to align navigation to the right in desktop -->
+                <div class="android-header-spacer mdl-layout-spacer"></div>
+                <div
+                    class="android-search-box mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right mdl-textfield--full-width">
+                    <label class="mdl-button mdl-js-button mdl-button--icon" for="search-field">
+                        <i class="material-icons">search</i>
+                    </label>
+                    <div class="mdl-textfield__expandable-holder">
+                        <input placeholder="サイト内検索(Enterで実行)" class="mdl-textfield__input" type="text"
+                            onkeypress="enter();" id="search-field">
+                    </div>
+                </div>
+                <!-- Navigation -->
+                <div class="android-navigation-container">
+                    <nav class="android-navigation mdl-navigation">
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="index.html">ホーム</a>
+                    </nav>
+                </div>
+                <!-- ホームページのタイトル用 -->
+                <span class="android-mobile-title mdl-layout-title">
+                    <!-- <img class="android-logo-image" src="design/logo_homepage.png"> -->
+                </span>
+                <button class="android-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect"
+                    id="more-button">
+                    <i class="material-icons">more_vert</i>
+                </button>
+                <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
+                    <!-- 3点ボタンの中身 -->
+                </ul>
+            </div>
+        </div>
+        <div class="android-drawer mdl-layout__drawer">
+            <span class="mdl-layout-title">
+                <h3>メニュー</h3>
+            </span>
+            <!-- <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link sokomin-layout-item" href="test/test.html">
+                        <strong>カラム１</strong>
+                    </a>
+                </nav> -->
+        </div>
+        <!--main-->
+        <div class="android-content mdl-layout__content">
+            <div class="main-background mdl-typography--text-center">
+                <section class="top1">
+                    <br>
+                    <h3>お知らせ</h3>
+                    <br>
+                    <br>
+                </section>
+                <section class="top2">
+                    <h4>更新履歴</h4>
+                    <!-- <table id="table2">
+                        <colgroup>
+                            <col span="1" width="20%">
+                            <col span="1" width="80%">
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td valign="top">2024/01/02</td>
+                                <td valign="top">
+                                    トップページのひな形
+                                    <br>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table> -->
+                </section>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <!--main-->
+                <!--Copyright (c) This site is created by Sokomin. All Rights Reserved.-->
+            </div>
+            <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        </div>
+</body>
+
+</html>

@@ -1,0 +1,469 @@
+/**
+ * TOPぺージ専用のCSS。
+ */
+
+body {
+  margin: 0;
+}
+
+/* Disable ugly boxes around images in IE10 */
+
+a img {
+  border: 0px;
+}
+
+a {
+  color: #1A0DAB;
+}
+
+a:visited {
+  color: #660099;
+}
+
+.mdl-cell--3-col {
+  width: calc(30% - 16px);
+}
+
+::-moz-selection {
+  background-color: #6ab344;
+  color: #fff;
+}
+
+::selection {
+  background-color: #6ab344;
+  color: #fff;
+}
+
+.android-search-box .mdl-textfield__input {
+  color: rgba(0, 0, 0, 0.87);
+  width: 150%;
+}
+
+.android-header .mdl-menu__container {
+  z-index: 50;
+  margin: 0 !important;
+}
+
+.mdl-textfield--expandable {
+  width: auto;
+}
+
+.android-fab {
+  position: absolute;
+  right: 20%;
+  bottom: -26px;
+  z-index: 3;
+  background: #64ffda !important;
+  color: black !important;
+}
+
+.android-mobile-title {
+  display: none !important;
+}
+
+.android-logo-image {
+  height: 28px;
+  width: 140px;
+}
+
+.banner-image {
+  /*リンク用バナー*/
+  width: 200px;
+  height: 40px;
+}
+
+.android-header {
+  overflow: visible;
+  background-color: white;
+}
+
+.android-header .material-icons {
+  color: #767777 !important;
+}
+
+.android-header .mdl-layout__drawer-button {
+  background: transparent;
+  color: #767777;
+}
+
+.android-header .mdl-navigation__link {
+  color: #757575;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.android-navigation-container {
+  /* Simple hack to make the overflow happen to the left instead... */
+  direction: rtl;
+  -webkit-order: 1;
+  -ms-flex-order: 1;
+  order: 1;
+  width: 500px;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.android-navigation {
+  /* ... and now make sure the content is actually LTR */
+  direction: ltr;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  width: 800px;
+}
+
+.android-search-box.is-focused+.android-navigation-container {
+  opacity: 0;
+  width: 100px;
+}
+
+.android-navigation .mdl-navigation__link {
+  display: inline-block;
+  height: 60px;
+  line-height: 68px;
+  background-color: transparent !important;
+  border-bottom: 4px solid transparent;
+}
+
+.android-navigation .mdl-navigation__link:hover {
+  border-bottom: 4px solid #8bc34a;
+}
+
+.android-search-box {
+  -webkit-order: 2;
+  -ms-flex-order: 2;
+  order: 2;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.android-more-button {
+  -webkit-order: 3;
+  -ms-flex-order: 3;
+  order: 3;
+}
+
+.android-drawer {
+  border-right: none;
+}
+
+.android-drawer-separator {
+  height: 1px;
+  background-color: #dcdcdc;
+  margin: 8px 0;
+}
+
+.android-drawer .mdl-navigation__link.mdl-navigation__link {
+  font-size: 18px;
+  color: #757575;
+}
+
+.android-drawer span.mdl-navigation__link.mdl-navigation__link {
+  color: #8bc34a;
+}
+
+.android-drawer .mdl-layout-title {
+  position: relative;
+  background: url("design/bg-base-01.png") center 30%;
+  height: 160px;
+}
+
+.android-drawer .android-logo-image {
+  position: absolute;
+  bottom: 16px;
+}
+
+.main-background {
+  position: relative;
+  height: auto;
+  background-color: #f3f3f3;
+  background: url("design/bg-base-01.png") repeat-y center 30%;
+  background-size: cover;
+}
+
+.logo-font {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  line-height: 1;
+  color: #767777;
+  font-weight: 500;
+}
+
+.android-more-section {
+  padding: 4px 0;
+  max-width: 1044px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.android-more-section .android-section-title {
+  margin-left: 4px;
+  padding-bottom: 4px;
+}
+
+.android-card-container {
+  min-width: 245px;
+}
+
+.android-card-container .mdl-card__media {
+  overflow: hidden;
+  background: transparent;
+  min-width: 245px;
+}
+
+.android-card-container .mdl-card__media img {
+  width: 120;
+}
+
+.android-card-container .mdl-card__title {
+  background: transparent;
+  height: auto;
+}
+
+.android-card-container .mdl-card__title-text {
+  color: black;
+  height: auto;
+  font-size: 22px;
+}
+
+.android-card-container .mdl-card__supporting-text {
+  height: auto;
+  color: black;
+  padding-bottom: 18px;
+}
+
+.android-card-container .mdl-card__actions {
+  position: absolute;
+  bottom: 0;
+}
+
+.android-card-container .mdl-card__actions a {
+  border-top: none;
+  font-size: 16px;
+}
+
+.android-footer {
+  background-color: #fafafa;
+  position: relative;
+}
+
+.android-footer a:hover {
+  color: #8bc34a;
+}
+
+.android-footer .mdl-mega-footer--top-section::after {
+  border-bottom: none;
+}
+
+.android-footer .mdl-mega-footer--middle-section::after {
+  border-bottom: none;
+}
+
+.android-footer .mdl-mega-footer--bottom-section {
+  position: relative;
+}
+
+.android-footer .mdl-mega-footer--bottom-section a {
+  margin-right: 2em;
+}
+
+.android-footer .mdl-mega-footer--right-section a .material-icons {
+  position: relative;
+  top: 6px;
+}
+
+
+/**** Mobile layout ****/
+
+@media (max-width: 900px) {
+  .android-navigation-container {
+    display: none;
+  }
+  .android-title {
+    display: none !important;
+  }
+  .android-mobile-title {
+    display: block !important;
+    position: absolute;
+    left: calc(50% - 70px);
+    top: 12px;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* WebViews in iOS 9 break the "~" operator, and WebViews in OS X 10.10 break
+     consecutive "+" operators in some cases. Therefore, we need to use both
+     here to cover all the bases. */
+  .android.android-more-button.is-focused~.android-mobile-title, .android-more-button.is-focused+.android-navigation-container+.android-mobile-title {
+    opacity: 0;
+  }
+  .android-search-box {
+    display: none;
+  }
+  .android-more-button.is-focused {
+    width: calc(100% - 48px);
+  }
+  .android-more-button .mdl-textfield__expandable-holder {
+    width: 100%;
+  }
+  .main-background {
+    height: fit-content;
+  }
+  .android-slogan {
+    font-size: 26px;
+    margin: 0 16px;
+    padding-top: 24px;
+  }
+  .android-sub-slogan {
+    font-size: 16px;
+    margin: 0 16px;
+    padding-top: 8px;
+  }
+  .android-create-character {
+    padding-top: 200px;
+    font-size: 16px;
+  }
+  .android-create-character img {
+    height: 12px;
+  }
+  .android-fab {
+    display: none;
+  }
+  .android-wear-band-text {
+    margin-left: 0;
+    padding: 16px;
+  }
+  .android-footer .mdl-mega-footer--bottom-section {
+    display: block;
+    /*none*/
+  }
+}
+
+.custom-table-rs {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/*テーブル用*/
+
+table#table1 {
+  width: 90%;
+  max-width: 666px;
+  table-layout: fixed;
+  border: 1px #555555 solid;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background-color: #000;
+  color: #fff;
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table#table1 th {
+  padding: 3px;
+  border: #555555 solid;
+  border-width: 0 0 1px 1px;
+  background-color: #222222;
+  font-weight: bold;
+  line-height: 120%;
+  text-align: center;
+}
+
+table#table1 td {
+  padding: 3px;
+  border: 1px #555555 solid;
+  border-width: 0 0 1px 1px;
+}
+
+/*スマホ向け表示がしたいので。*/
+
+@media only screen and (max-width:400px) {
+  .scrollTable {
+    overflow: auto;
+    margin-bottom: 20px;
+  }
+  .scrollTable table {
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .scrollTable::-webkit-scrollbar {
+    height: 10px;
+  }
+  .scrollTable::-webkit-scrollbar-track {
+    background: #EEE;
+  }
+  .scrollTable::-webkit-scrollbar-thumb {
+    background: #999;
+  }
+}
+
+/*パターン2(シンプルな枠組みとして使う場合)*/
+
+table#table2 {
+  width: 80%;
+  max-width: 666px;
+  border: 0px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.android-large-table {
+  overflow: scroll;
+}
+
+.android-large-table>.main-background {
+  width: fit-content;
+  min-width: 100%;
+}
+
+.korea-content {
+  text-align: left;
+  padding-left: 8%;
+}
+
+/* 参考配色：https://iro-color.com/questionnaire/ranking/number1.html 
+数字のイメージカラーを使いたいときとか、一次修正、2次修正…なんて時の文字列に。*/
+/* どれかの色が2X未満でどれかがEX以上だと割とどこでも相性良い色になるっぽい。 */
+
+.color-image1 {
+  color: red;
+}
+
+.color-image2 {
+  color: blue;
+}
+
+.color-image3 {
+  color: #FFB70C;
+}
+
+.color-image4 {
+  color: green;
+}
+
+.color-image5 {
+  color: #005EE4;
+}
+
+.color-image6 {
+  color: #00EE94;
+}
+
+.color-image7 {
+  /* 東雲(しののめ)色 */
+  color: #E77F38;
+}
+
+.color-image8 {
+  /* インディゴ */
+  color: #21428B;
+}
+
+.color-image9 {
+  /* アマラント */
+  color: #A3046C;
+}
+
+.color-image10 {
+  color: #615346;
+}
