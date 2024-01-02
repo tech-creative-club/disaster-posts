@@ -59,6 +59,8 @@ JP | [EN](README.en.md)
 
 があれば、[Issue](https://github.com/tech-creative-club/disaster-posts/issues)に投稿してください。
 
+## コントリビューター行動規範
+[行動規範](CODE_OF_CONDUCT.md)をお読みください。
 ## デプロイ
 (準備中)
 

@@ -51,12 +51,15 @@
 ### Backend
 (Coming soon)
 
-## Issue
+## Issues
 
 - Bug
 - Request
 - Improvement
 - etc.
+
+## Contributing
+Please read [CONTRIBUTING.md](CONTRIBUTING.en.md) for details on our code of conduct, and the process for submitting pull requests to us.
   
 If you have any of these, please post them in [Issue](https://github.com/tech-creative-club/disaster-posts/issues).
 
