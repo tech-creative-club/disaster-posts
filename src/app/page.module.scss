@@ -10,3 +10,13 @@
     margin: auto 0;
   }
 }
+
+.content_list__wrapper {
+  max-width: 90%;
+  margin: auto;
+  
+  .content_list {
+    display: inline-block;
+    width: 25%;
+  }
+}
