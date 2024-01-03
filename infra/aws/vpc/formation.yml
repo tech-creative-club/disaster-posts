@@ -699,3 +699,39 @@ Resources:
         - !Ref PrivateSubnet2
         - !Ref PrivateSubnet3
       VpcEndpointType: Interface
+Outputs:
+  VpcId:
+    Value: !Ref Vpc
+    Description: VPC ID
+    Export:
+      Name: !Sub "${AWS::StackName}-Vpc"
+  PublicSubnet1Id:
+    Value: !Ref PublicSubnet1
+    Description: Public subnet 1 ID
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet1"
+  PrivateSubnet1Id:
+    Value: !Ref PrivateSubnet1
+    Description: Private subnet 1 ID
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet1"
+  PublicSubnet2Id:
+    Value: !Ref PublicSubnet2
+    Description: Public subnet 1 ID
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet2"
+  PrivateSubnet2Id:
+    Value: !Ref PrivateSubnet2
+    Description: Private subnet 1 ID
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet2"
+  PublicSubnet3Id:
+    Value: !Ref PublicSubnet3
+    Description: Public subnet 1 ID
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet3"
+  PrivateSubnet3Id:
+    Value: !Ref PrivateSubnet3
+    Description: Private subnet 1 ID
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnet3"
