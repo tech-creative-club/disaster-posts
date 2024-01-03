@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Disaster posts SES
+Parameters:
+  ApplicationTag:
+    Type: String
+    Description: Application tag
+  ApplicationId:
+    Type: String
+    Description: Application ARN
+  DomainName:
+    Type: String
+    Description: Send domain name
+  ZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: Route 53 zone ID
+Resources:
+  # Application relationship definition
+  AppAssoc:
+    Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation
+    Properties:
+      Application: !Ref ApplicationId
+      Resource: !Ref AWS::StackId
+      ResourceType: CFN_STACK
+  # Bounce and complaint handling mechanism definition
+  Topic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub "${AWS::StackName}-Topic"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Topic"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
+  ConfigSet:
+    Type: AWS::SES::ConfigurationSet
+    Properties:
+      ReputationOptions:
+        ReputationMetricsEnabled: true
+      SendingOptions:
+        SendingEnabled: true
+  ConfigSetEventDestination:
+    Type: AWS::SES::ConfigurationSetEventDestination
+    Properties:
+      ConfigurationSetName: !Ref ConfigSet
+      EventDestination:
+        Enabled: true
+        MatchingEventTypes:
+          - bounce
+          - complaint
+        SnsDestination:
+          TopicARN: !Ref Topic
+  # SES identity definition
+  Identity:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref DomainName
+      ConfigurationSetAttributes:
+        ConfigurationSetName: !Ref ConfigSet
+      DkimAttributes:
+        SigningEnabled: true
+      DkimSigningAttributes:
+        NextSigningKeyLength: RSA_2048_BIT
+      MailFromAttributes:
+        MailFromDomain: !Sub "ses-${AWS::Region}.${DomainName}"
+  # SES DKIM and verification records
+  DkimRecords:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      Comment: !Sub "${AWS::StackName} DKIM records"
+      HostedZoneId: !Ref ZoneId
+      RecordSets:
+        - Name: !GetAtt Identity.DkimDNSTokenName1
+          Type: CNAME
+          TTL: "900"
+          ResourceRecords:
+            - !GetAtt Identity.DkimDNSTokenValue1
+        - Name: !GetAtt Identity.DkimDNSTokenName2
+          Type: CNAME
+          TTL: "900"
+          ResourceRecords:
+            - !GetAtt Identity.DkimDNSTokenValue2
+        - Name: !GetAtt Identity.DkimDNSTokenName3
+          Type: CNAME
+          TTL: "900"
+          ResourceRecords:
+            - !GetAtt Identity.DkimDNSTokenValue3
+  # SES SPF and MX records
+  SpfRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: SPF record
+      HostedZoneId: !Ref ZoneId
+      Name: !Sub "ses-${AWS::Region}.${DomainName}"
+      Type: TXT
+      TTL: "900"
+      ResourceRecords:
+        - '"v=spf1 include:amazonses.com ~all"'
+  MxRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: MX record
+      HostedZoneId: !Ref ZoneId
+      Name: !Sub "ses-${AWS::Region}.${DomainName}"
+      Type: MX
+      TTL: "900"
+      ResourceRecords:
+        - !Sub "10 feedback-smtp.${AWS::Region}.amazonses.com"
