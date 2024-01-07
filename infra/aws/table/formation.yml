@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Disaster posts DynamoDB global table
+Parameters:
+  ApplicationTag:
+    Type: String
+    Description: Application tag
+  ApplicationId:
+    Type: String
+    Description: Application ARN
+  SubRegion:
+    Type: String
+    Description: Sub region
+    Default: ap-northeast-3
+  SubRegionApplicationTag:
+    Type: String
+    Description: Sub region Application tag
+Resources:
+  # Application relationship definition
+  AppAssoc:
+    Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation
+    Properties:
+      Application: !Ref ApplicationId
+      Resource: !Ref AWS::StackId
+      ResourceType: CFN_STACK
+  # DynamoDB table definition
+  # TODO: テーブルスキーマの決定
+  Table:
+    Type: AWS::DynamoDB::GlobalTable
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: 'N'
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      Replicas:
+        - Region: !Ref AWS::Region
+          PointInTimeRecoverySpecification:
+            PointInTimeRecoveryEnabled: true
+          Tags:
+            - Key: Name
+              Value: !Sub "${AWS::StackName}-Table-Replica-${AWS::Region}"
+            - Key: AppManagerCFNStackKey
+              Value: !Ref AWS::StackName
+            - Key: awsApplication
+              Value: !Ref ApplicationTag
+        - Region: !Ref SubRegion
+          PointInTimeRecoverySpecification:
+            PointInTimeRecoveryEnabled: true
+          Tags:
+            - Key: Name
+              Value: !Sub "${AWS::StackName}-Table-Replica-${SubRegion}"
+            - Key: AppManagerCFNStackKey
+              Value: !Ref AWS::StackName
+            - Key: awsApplication
+              Value: !Ref ApplicationTag
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES

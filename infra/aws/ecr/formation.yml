@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Disaster posts container registry
+Parameters:
+  ApplicationTag:
+    Type: String
+    Description: Application tag
+  ApplicationId:
+    Type: String
+    Description: Application ARN
+Resources:
+  # Application relationship definition
+  AppAssoc:
+    Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation
+    Properties:
+      Application: !Ref ApplicationId
+      Resource: !Ref AWS::StackId
+      ResourceType: CFN_STACK
+  Repository:
+    Type: AWS::ECR::Repository
+    Properties:
+      EmptyOnDelete: true
+      ImageTagMutability: IMMUTABLE
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Repository"
+        - Key: AppManagerCFNStackKey
+          Value: !Ref AWS::StackName
+        - Key: awsApplication
+          Value: !Ref ApplicationTag
