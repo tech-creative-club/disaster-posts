@@ -3,7 +3,7 @@
   gap: 1em;
   padding: 1em;
 
-  .text_area {
+  .text_content_area {
     flex: 1;
   }
   .post_button {
@@ -15,8 +15,42 @@
   max-width: 90%;
   margin: auto;
   
+  
   .content_list {
     display: inline-block;
     width: 25%;
+  }
+
+  .content  {
+    border-bottom: 1px solid #ccc;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .post_form{
+    .text_content_area {
+      position: fixed;
+      bottom: 0;
+      left: 40%;
+      width: 40%;
+      padding: 15px;
+      background-color: #fff;
+    }
+    .text_name_area {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      width: 40%;
+      padding: 15px;
+      background-color: #fff;
+    } 
+
+    .post_button {
+      position: fixed;
+      bottom: 25px;
+      right: 0;
+      width: 20%;
+      background-color: #fff;
+    }
   }
 }
